@@ -11,8 +11,10 @@ from migrate import migrate_model
 from segnet_v2 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
+log_dir = '/content/drive/My Drive/logdir'
+checkpoint_models_path = '/content/drive/My Drive/checkpoints'
+
 if __name__ == '__main__':
-    checkpoint_models_path = 'models/'
     # Parse arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--pretrained", help="path to save pretrained model files")
@@ -20,7 +22,7 @@ if __name__ == '__main__':
     pretrained_path = args["pretrained"]
 
     # Callbacks
-    tensor_board = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
+    tensor_board = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0, write_graph=True, write_images=True)
     model_names = checkpoint_models_path + 'final.{epoch:02d}-{val_loss:.4f}.hdf5'
     model_checkpoint = ModelCheckpoint(model_names, monitor='val_loss', verbose=1, save_best_only=True)
     early_stop = EarlyStopping('val_loss', patience=patience)
