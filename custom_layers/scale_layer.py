@@ -1,10 +1,10 @@
-from keras.layers.core import Layer
-from keras.engine import InputSpec
-from keras import backend as K
+from tensorflow.keras.layers import Layer
+from tensorflow.keras.layers import InputSpec
+from tensorflow.keras import backend as K
 try:
-    from keras import initializations
+    from tensorflow.keras import initializations
 except ImportError:
-    from keras import initializers as initializations
+    from tensorflow.keras import initializers as initializations
 
 class Scale(Layer):
     '''Learns a set of weights and biases used for scaling the input data.
@@ -45,12 +45,12 @@ class Scale(Layer):
     def build(self, input_shape):
         self.input_spec = [InputSpec(shape=input_shape)]
         shape = (int(input_shape[self.axis]),)
-
         # Compatibility with TensorFlow >= 1.0.0
         self.gamma = K.variable(self.gamma_init(shape), name='{}_gamma'.format(self.name))
         self.beta = K.variable(self.beta_init(shape), name='{}_beta'.format(self.name))
         #self.gamma = self.gamma_init(shape, name='{}_gamma'.format(self.name))
         #self.beta = self.beta_init(shape, name='{}_beta'.format(self.name))
+        print(self.gamma)
         self.trainable_weights = [self.gamma, self.beta]
 
         if self.initial_weights is not None:

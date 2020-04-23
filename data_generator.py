@@ -5,7 +5,7 @@ from random import shuffle
 
 import cv2 as cv
 import numpy as np
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
 
 from config import batch_size
 from config import fg_path, bg_path, a_path

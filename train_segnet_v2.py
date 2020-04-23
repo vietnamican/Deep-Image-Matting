@@ -4,12 +4,11 @@ import tensorflow.keras as keras
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.utils import multi_gpu_model
-from tensorflow.keras.layers import Input
 
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 from data_generator import train_gen, valid_gen
 from migrate import migrate_model
-from segnet import build_encoder_decoder, build_refinement
+from segnet_v2 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
 if __name__ == '__main__':
@@ -59,8 +58,7 @@ if __name__ == '__main__':
         #     final.load_weights(pretrained_path)
         # else:
         #     migrate_model(final)
-    # decoder_target = Input((None, None, None), dtype='float32')
-    # decoder_target = tf.placeholder(dtype='float32', shape=(None, None, None, None))
+
     final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
