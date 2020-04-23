@@ -29,12 +29,12 @@ if __name__ == '__main__':
     zip_ref.close()
 
     if not os.path.exists(bg_path):
-        # zip_file = 'data/train2014.zip'
-        # print('Extracting {}...'.format(zip_file))
+        zip_file = 'data/train2014.zip'
+        print('Extracting {}...'.format(zip_file))
 
-        # zip_ref = zipfile.ZipFile(zip_file, 'r')
-        # zip_ref.extractall('data')
-        # zip_ref.close()
+        zip_ref = zipfile.ZipFile(zip_file, 'r')
+        zip_ref.extractall('data')
+        zip_ref.close()
 
         with open(os.path.join(train_folder, 'training_bg_names.txt')) as f:
             training_bg_names = f.read().splitlines()
@@ -65,9 +65,9 @@ if __name__ == '__main__':
             dest_path = os.path.join(a_path, a_file)
             shutil.move(src_path, dest_path)
 
-    # if not os.path.exists(out_path):
-    #     os.makedirs(out_path)
-    # # do_composite()
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+    # do_composite()
 
     # path to provided foreground images
     fg_test_path = 'data/fg_test/'
