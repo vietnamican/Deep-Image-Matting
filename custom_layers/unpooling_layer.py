@@ -1,6 +1,7 @@
-from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Layer
-from tensorflow.keras.layers import Lambda, Multiply
+from keras import backend as K
+from keras.engine.topology import Layer
+from keras.layers import Lambda, Multiply
+
 
 class Unpooling(Layer):
 
@@ -12,7 +13,6 @@ class Unpooling(Layer):
 
     def call(self, inputs, **kwargs):
         x = inputs[:, 1]
-        # print(K.get_shape(x))
         # print('x.shape: ' + str(K.int_shape(x)))
         bool_mask = Lambda(lambda t: K.greater_equal(t[:, 0], t[:, 1]),
                            output_shape=K.int_shape(x)[1:])(inputs)

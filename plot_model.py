@@ -1,6 +1,6 @@
 # dependency: pip install pydot & brew install graphviz
 from model import build_encoder_decoder
-from tensorflow.keras.utils import plot_model
+from keras.utils import plot_model
 
 if __name__ == '__main__':
     img_rows, img_cols = 320, 320

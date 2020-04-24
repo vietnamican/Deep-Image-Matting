@@ -1,10 +1,10 @@
-import tensorflow.keras.backend as K
+import keras.backend as K
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Reshape, \
+from keras.layers import Input, Conv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Reshape, \
     Concatenate, Lambda
-from tensorflow.keras.models import Model
-from tensorflow.keras.utils import multi_gpu_model
-from tensorflow.keras.utils import plot_model
+from keras.models import Model
+from keras.utils import multi_gpu_model
+from keras.utils import plot_model
 
 from custom_layers.unpooling_layer import Unpooling
 
