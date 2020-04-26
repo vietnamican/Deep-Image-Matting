@@ -3,7 +3,7 @@ import os
 import random
 
 import cv2 as cv
-import keras.backend as K
+import tensorflow.keras.backend as K
 import numpy as np
 
 from data_generator import generate_trimap, random_choice, get_alpha_test

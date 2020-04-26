@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import cv2 as cv
-import keras.backend as K
+import tensorflow.keras.backend as K
 import numpy as np
 
 from model import build_encoder_decoder, build_refinement

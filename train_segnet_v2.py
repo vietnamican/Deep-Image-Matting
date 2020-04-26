@@ -1,9 +1,9 @@
 import argparse
 
-import keras
+import tensorflow.keras as keras
 import tensorflow as tf
-from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
-from keras.utils import multi_gpu_model
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.utils import multi_gpu_model
 
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 from data_generator import train_gen, valid_gen
@@ -14,6 +14,10 @@ from utils import overall_loss, get_available_cpus, get_available_gpus
 if __name__ == '__main__':
     checkpoint_models_path = 'models/'
     # Parse arguments
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-p", "--pretrained", help="path to save pretrained model files")
+    args = vars(ap.parse_args())
+    pretrained_path = args["pretrained"]
 
     # Callbacks
     tensor_board = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
@@ -39,6 +43,10 @@ if __name__ == '__main__':
         with tf.device("/cpu:0"):
             model = build_encoder_decoder()
             model = build_refinement(model)
+            # if pretrained_path is not None:
+            #     model.load_weights(pretrained_path)
+            # else:
+            #     migrate_model(model)
 
         final = multi_gpu_model(model, gpus=num_gpu)
         # rewrite the callback: saving through the original model and not the multi-gpu model.
@@ -46,9 +54,12 @@ if __name__ == '__main__':
     else:
         model = build_encoder_decoder()
         final = build_refinement(model)
+        # if pretrained_path is not None:
+        #     final.load_weights(pretrained_path)
+        # else:
+        #     migrate_model(final)
 
-    decoder_target = tf.placeholder(dtype='float32', shape=(None, None, None, None))
-    final.compile(optimizer='nadam', loss=overall_loss, target_tensors=[decoder_target])
+    final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
 
@@ -62,7 +73,7 @@ if __name__ == '__main__':
                         validation_steps=num_valid_samples // batch_size,
                         epochs=epochs,
                         verbose=1,
-                        callbacks=callbacks,
-                        use_multiprocessing=True,
-                        workers=2
+                        callbacks=callbacks
+                        # use_multiprocessing=True,
+                        # workers=2
                         )

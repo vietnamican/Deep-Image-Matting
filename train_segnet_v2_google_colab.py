@@ -1,19 +1,21 @@
 import argparse
+import os
 
 import tensorflow.keras as keras
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.utils import multi_gpu_model
-from tensorflow.keras.layers import Input
 
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 from data_generator import train_gen, valid_gen
 from migrate import migrate_model
-from segnet import build_encoder_decoder, build_refinement
+from segnet_v2 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
 if __name__ == '__main__':
-    checkpoint_models_path = 'models/'
+    base_dir = "./"
+    # base_dir = "/content/drive/Shared drives/DNN/Deep-Image-Matting/"
+    checkpoint_models_path = base_dir + 'checkpoints/'
     # Parse arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--pretrained", help="path to save pretrained model files")
@@ -21,9 +23,11 @@ if __name__ == '__main__':
     pretrained_path = args["pretrained"]
 
     # Callbacks
-    tensor_board = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
-    model_names = checkpoint_models_path + 'final.{epoch:02d}-{val_loss:.4f}.hdf5'
-    model_checkpoint = ModelCheckpoint(model_names, monitor='val_loss', verbose=1, save_best_only=True)
+    tensor_board = keras.callbacks.TensorBoard(log_dir= base_dir + 'logdir', histogram_freq=0, write_graph=True, write_images=True)
+    model_names = checkpoint_models_path + 'final.{epoch:02d}-{val_loss:.4f}.h5'
+    best_model_name = checkpoint_models_path + 'best.ckpt'
+    model_checkpoint = ModelCheckpoint(model_names, monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=True)
+    best_model_checkpoint = ModelCheckpoint(best_model_name, monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=True)
     early_stop = EarlyStopping('val_loss', patience=patience)
     reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience / 4), verbose=1)
 
@@ -40,6 +44,8 @@ if __name__ == '__main__':
 
     # Load our model, added support for Multi-GPUs
     num_gpu = len(get_available_gpus())
+
+    
     if num_gpu >= 2:
         with tf.device("/cpu:0"):
             model = build_encoder_decoder()
@@ -59,17 +65,18 @@ if __name__ == '__main__':
         #     final.load_weights(pretrained_path)
         # else:
         #     migrate_model(final)
-    # decoder_target = Input((None, None, None), dtype='float32')
-    # decoder_target = tf.placeholder(dtype='float32', shape=(None, None, None, None))
-    final.compile(optimizer='nadam', loss=overall_loss)
 
+    final.compile(optimizer='nadam', loss=overall_loss)
     print(final.summary())
+    
+    if len(os.listdir(checkpoint_models_path)) > 0:
+        final.load_weights(checkpoint_models_path + 'best.ckpt')
 
     # Final callbacks
-    callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
+    callbacks = [tensor_board, model_checkpoint, best_model_checkpoint, early_stop, reduce_lr]
 
     # Start Fine-tuning
-    final.fit_generator(train_gen(),
+    final.fit(train_gen(),
                         steps_per_epoch=num_train_samples // batch_size,
                         validation_data=valid_gen(),
                         validation_steps=num_valid_samples // batch_size,

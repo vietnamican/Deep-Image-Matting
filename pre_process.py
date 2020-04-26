@@ -65,9 +65,9 @@ if __name__ == '__main__':
             dest_path = os.path.join(a_path, a_file)
             shutil.move(src_path, dest_path)
 
-    if not os.path.exists(out_path):
-        os.makedirs(out_path)
-    # do_composite()
+    # if not os.path.exists(out_path):
+    #     os.makedirs(out_path)
+    # # do_composite()
 
     # path to provided foreground images
     fg_test_path = 'data/fg_test/'
