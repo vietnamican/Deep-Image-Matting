@@ -1,6 +1,6 @@
 import tensorflow.keras.backend as K
 import tensorflow.compat.v1 as tf
-from tensorflow.keras.layers import Input, Conv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Reshape, \
+from tensorflow.keras.layers import Input, Conv2D, SeparableConv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Reshape, \
     Concatenate, Lambda
 from tensorflow.keras.models import Model
 from tensorflow.keras.utils import multi_gpu_model
@@ -43,10 +43,10 @@ def build_encoder_decoder():
 
     inputs_size = x.get_shape()[1:3]
     # Atrous convolution
-    conv_4_1x1 = Conv2D(256, (1, 1), activation='relu', padding='same', name='conv4_1x1')(x)
-    conv_4_3x3_1 = Conv2D(256, (kernel, kernel), activation='relu', padding='same', dilation_rate=ATROUS_RATES[0], name='conv4_3x3_1')(x)
-    conv_4_3x3_2 = Conv2D(256, (kernel, kernel), activation='relu', padding='same', dilation_rate=ATROUS_RATES[1], name='conv4_3x3_2')(x)
-    conv_4_3x3_3 = Conv2D(256, (kernel, kernel), activation='relu', padding='same', dilation_rate=ATROUS_RATES[2], name='conv4_3x3_3')(x)  
+    conv_4_1x1 = SeparableConv2D(256, (1, 1), activation='relu', padding='same', name='conv4_1x1')(x)
+    conv_4_3x3_1 = SeparableConv2D(256, (kernel, kernel), activation='relu', padding='same', dilation_rate=ATROUS_RATES[0], name='conv4_3x3_1')(x)
+    conv_4_3x3_2 = SeparableConv2D(256, (kernel, kernel), activation='relu', padding='same', dilation_rate=ATROUS_RATES[1], name='conv4_3x3_2')(x)
+    conv_4_3x3_3 = SeparableConv2D(256, (kernel, kernel), activation='relu', padding='same', dilation_rate=ATROUS_RATES[2], name='conv4_3x3_3')(x)  
     # Image average pooling
     image_level_features = Lambda(lambda x: tf.reduce_mean(x, [1, 2], keepdims=True), name='global_average_pooling')(x)
     image_level_features = Conv2D(256, (1, 1), activation='relu', padding='same', name='image_level_features_conv_1x1')(image_level_features)
@@ -76,16 +76,19 @@ def build_refinement(encoder_decoder):
     input = Lambda(lambda i: i[:, :, :, 0:3])(input_tensor)
 
     x = Concatenate(axis=3)([input, encoder_decoder.output])
-    x = Conv2D(64, (3, 3), activation='relu', padding='same', kernel_initializer='he_normal',
+    x = SeparableConv2D(64, (3, 3), activation='relu', padding='same', kernel_initializer='he_normal',
                bias_initializer='zeros')(x)
     x = BatchNormalization()(x)
-    x = Conv2D(64, (3, 3), activation='relu', padding='same', kernel_initializer='he_normal',
+    x = SeparableConv2D(64, (3, 3), activation='relu', padding='same', kernel_initializer='he_normal',
                bias_initializer='zeros')(x)
     x = BatchNormalization()(x)
-    x = Conv2D(64, (3, 3), activation='relu', padding='same', kernel_initializer='he_normal',
+    x = SeparableConv2D(64, (3, 3), activation='relu', padding='same', kernel_initializer='he_normal',
                bias_initializer='zeros')(x)
     x = BatchNormalization()(x)
-    x = Conv2D(1, (3, 3), activation='sigmoid', padding='same', name='refinement_pred', kernel_initializer='he_normal',
+    x = SeparableConv2D(64, (3, 3), activation='relu', padding='same', kernel_initializer='he_normal',
+               bias_initializer='zeros')(x)
+    x = BatchNormalization()(x)
+    x = SeparableConv2D(1, (3, 3), activation='sigmoid', padding='same', name='refinement_pred', kernel_initializer='he_normal',
                bias_initializer='zeros')(x)
 
     model = Model(inputs=input_tensor, outputs=x)
