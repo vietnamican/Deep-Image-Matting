@@ -9,11 +9,11 @@ from tensorflow.keras.utils import multi_gpu_model
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 from data_generator import train_gen, valid_gen
 from migrate import migrate_model
-from segnet_v3 import build_encoder_decoder, build_refinement
+from segnet_v4 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
-log_dir = '/content/drive/Shared drives/DNN/Deep-Image-Matting/logs_3'
-checkpoint_models_path = '/content/drive/Shared drives/DNN/Deep-Image-Matting/checkpoints_3/'
+log_dir = './logs_4'
+checkpoint_models_path = './checkpoints_4/'
 
 if __name__ == '__main__':
     # Parse arguments
