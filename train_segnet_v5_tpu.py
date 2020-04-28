@@ -72,6 +72,6 @@ if __name__ == '__main__':
                         epochs=epochs,
                         verbose=1,
                         callbacks=callbacks,
-                        use_multiprocessing=True,
-                        workers=2
+                        # use_multiprocessing=True,
+                        # workers=2
                         )
