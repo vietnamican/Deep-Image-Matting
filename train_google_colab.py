@@ -5,15 +5,16 @@ import tensorflow.keras as keras
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.utils import multi_gpu_model
+from tensorflow.keras.layers import Input
 
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 from data_generator import train_gen, valid_gen
 from migrate import migrate_model
-from segnet_v3 import build_encoder_decoder, build_refinement
+from segnet import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
-log_dir = './logs_3'
-checkpoint_models_path = './checkpoints_3/'
+checkpoint_models_path = "/content/drive/Shared drives/DNN/Deep-Image-Matting/checkpoints_1/"
+logdir = "/content/drive/Shared drives/DNN/Deep-Image-Matting/logs_1"
 
 if __name__ == '__main__':
     # Parse arguments
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     pretrained_path = args["pretrained"]
 
     # Callbacks
-    tensor_board = keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=0, write_graph=True, write_images=True)
+    tensor_board = keras.callbacks.TensorBoard(log_dir=logdir, histogram_freq=0, write_graph=True, write_images=True)
     model_names = checkpoint_models_path + 'final.{epoch:02d}-{val_loss:.4f}.hdf5'
     model_checkpoint = ModelCheckpoint(model_names, monitor='val_loss', verbose=1, save_best_only=True)
     best_model_checkpoint = ModelCheckpoint(checkpoint_models_path + "best.hdf5", monitor='val_loss', verbose=1, save_best_only=True)
@@ -62,6 +63,8 @@ if __name__ == '__main__':
         #     final.load_weights(pretrained_path)
         # else:
         #     migrate_model(final)
+    # decoder_target = Input((None, None, None), dtype='float32')
+    # decoder_target = tf.placeholder(dtype='float32', shape=(None, None, None, None))
     if "best.hdf5" in os.listdir(checkpoint_models_path):
         final.load_weights(checkpoint_models_path+"best.hdf5")
     final.compile(optimizer='nadam', loss=overall_loss)
@@ -69,7 +72,7 @@ if __name__ == '__main__':
     print(final.summary())
 
     # Final callbacks
-    callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
+    callbacks = [tensor_board, model_checkpoint, best_model_checkpoint, early_stop, reduce_lr]
 
     # Start Fine-tuning
     final.fit_generator(train_gen(),

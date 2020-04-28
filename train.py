@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import tensorflow.keras as keras
 import tensorflow as tf
@@ -12,8 +13,10 @@ from migrate import migrate_model
 from segnet import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
+checkpoint_models_path = './checkpoints_1/'
+logdir = "./logs_1"
+
 if __name__ == '__main__':
-    checkpoint_models_path = 'models/'
     # Parse arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--pretrained", help="path to save pretrained model files")
@@ -21,9 +24,10 @@ if __name__ == '__main__':
     pretrained_path = args["pretrained"]
 
     # Callbacks
-    tensor_board = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
+    tensor_board = keras.callbacks.TensorBoard(log_dir=logdir, histogram_freq=0, write_graph=True, write_images=True)
     model_names = checkpoint_models_path + 'final.{epoch:02d}-{val_loss:.4f}.hdf5'
     model_checkpoint = ModelCheckpoint(model_names, monitor='val_loss', verbose=1, save_best_only=True)
+    best_model_checkpoint = ModelCheckpoint(checkpoint_models_path + "best.hdf5", monitor='val_loss', verbose=1, save_best_only=True)
     early_stop = EarlyStopping('val_loss', patience=patience)
     reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience / 4), verbose=1)
 
@@ -61,12 +65,14 @@ if __name__ == '__main__':
         #     migrate_model(final)
     # decoder_target = Input((None, None, None), dtype='float32')
     # decoder_target = tf.placeholder(dtype='float32', shape=(None, None, None, None))
+    if "best.hdf5" in os.listdir(checkpoint_models_path):
+        final.load_weights(checkpoint_models_path+"best.hdf5")
     final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
 
     # Final callbacks
-    callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
+    callbacks = [tensor_board, model_checkpoint, best_model_checkpoint, early_stop, reduce_lr]
 
     # Start Fine-tuning
     final.fit_generator(train_gen(),

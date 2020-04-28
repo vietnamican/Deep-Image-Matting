@@ -54,10 +54,7 @@ def build_encoder_decoder():
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
     # Decoder
-    # x = Conv2D(4096, (7, 7), activation='relu', padding='valid', name='conv6')(x)
-    # x = BatchNormalization()(x)
-    # x = UpSampling2D(size=(7, 7))(x)
-
+    #
     x = Conv2D(512, (1, 1), activation='relu', padding='same', name='deconv6', kernel_initializer='he_normal',
                bias_initializer='zeros')(x)
     x = BatchNormalization()(x)
@@ -65,13 +62,9 @@ def build_encoder_decoder():
     the_shape = K.int_shape(orig_5)
     shape = (1, the_shape[1], the_shape[2], the_shape[3])
     origReshaped = Reshape(shape)(orig_5)
-    # print('origReshaped.shape: ' + str(K.int_shape(origReshaped)))
     xReshaped = Reshape(shape)(x)
-    # print('xReshaped.shape: ' + str(K.int_shape(xReshaped)))
     together = Concatenate(axis=1)([origReshaped, xReshaped])
-    # print('together.shape: ' + str(K.int_shape(together)))
     x = Unpooling()(together)
-
     x = Conv2D(512, (5, 5), activation='relu', padding='same', name='deconv5', kernel_initializer='he_normal',
                bias_initializer='zeros')(x)
     x = BatchNormalization()(x)
@@ -82,7 +75,6 @@ def build_encoder_decoder():
     xReshaped = Reshape(shape)(x)
     together = Concatenate(axis=1)([origReshaped, xReshaped])
     x = Unpooling()(together)
-
     x = Conv2D(256, (5, 5), activation='relu', padding='same', name='deconv4', kernel_initializer='he_normal',
                bias_initializer='zeros')(x)
     x = BatchNormalization()(x)

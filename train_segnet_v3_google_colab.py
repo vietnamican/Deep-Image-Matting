@@ -12,8 +12,8 @@ from migrate import migrate_model
 from segnet_v3 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
-log_dir = './logs_3'
-checkpoint_models_path = './checkpoints_3/'
+log_dir = '/content/drive/Shared drives/DNN/Deep-Image-Matting/logs_3'
+checkpoint_models_path = '/content/drive/Shared drives/DNN/Deep-Image-Matting/checkpoints_3/'
 
 if __name__ == '__main__':
     # Parse arguments

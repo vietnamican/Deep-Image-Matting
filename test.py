@@ -3,7 +3,7 @@ import argparse
 import cv2 as cv
 import numpy as np
 
-from model import build_encoder_decoder, build_refinement
+from segnet import build_encoder_decoder, build_refinement
 from utils import get_final_output
 
 # python test.py -i "images/image.png" -t "images/trimap.png"
@@ -11,7 +11,7 @@ if __name__ == '__main__':
     img_rows, img_cols = 320, 320
     channel = 4
 
-    model_weights_path = 'models/final.42-0.0398.hdf5'
+    model_weights_path = 'final.01-0.1086.hdf5'
     encoder_decoder = build_encoder_decoder()
     final = build_refinement(encoder_decoder)
     final.load_weights(model_weights_path)
