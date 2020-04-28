@@ -57,7 +57,7 @@ if __name__ == '__main__':
         final = build_refinement(model)
         if pretrained_path is not None:
             final.load_weights(pretrained_path)
-    final.compile(optimizer='nadam', loss=overall_loss)
+        final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
 
