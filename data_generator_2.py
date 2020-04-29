@@ -48,30 +48,30 @@ def get_raw(type_of_dataset, count):
     return temp
 
 kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (3, 3))
-with open('data/Combined_Dataset/Training_set/training_fg_names.txt') as f:
+with open('data/training_fg_names.txt') as f:
     fg_files = f.read().splitlines()
-with open('data/Combined_Dataset/Test_set/test_fg_names.txt') as f:
+with open('data/test_fg_names.txt') as f:
     fg_test_files = f.read().splitlines()
-with open('data/Combined_Dataset/Training_set/training_bg_names.txt') as f:
+with open('data/training_bg_names.txt') as f:
     bg_files = f.read().splitlines()
-with open('data/Combined_Dataset/Test_set/test_bg_names.txt') as f:
+with open('data/test_bg_names.txt') as f:
     bg_test_files = f.read().splitlines()
 
 
-def get_alpha(name):
-    fg_i = int(name.split("_")[0])
-    name = fg_files[fg_i]
-    filename = os.path.join('data/mask', name)
-    alpha = cv.imread(filename, 0)
-    return alpha
+# def get_alpha(name):
+#     fg_i = int(name.split("_")[0])
+#     name = fg_files[fg_i]
+#     filename = os.path.join('data/mask', name)
+#     alpha = cv.imread(filename, 0)
+#     return alpha
 
 
-def get_alpha_test(name):
-    fg_i = int(name.split("_")[0])
-    name = fg_test_files[fg_i]
-    filename = os.path.join('data/mask_test', name)
-    alpha = cv.imread(filename, 0)
-    return alpha
+# def get_alpha_test(name):
+#     fg_i = int(name.split("_")[0])
+#     name = fg_test_files[fg_i]
+#     filename = os.path.join('data/mask_test', name)
+#     alpha = cv.imread(filename, 0)
+#     return alpha
 
 
 def composite4(fg, bg, a, w, h):
