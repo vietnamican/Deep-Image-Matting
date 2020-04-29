@@ -48,6 +48,7 @@ def build_encoder_decoder():
     # Concat
     x = Concatenate(axis=3)([conv_4_1x1, conv_4_3x3_1, conv_4_3x3_2, conv_4_3x3_3, image_level_features])
     x = Conv2D(256, (1,1), activation='relu', padding='same', name='conv_1x1_concat')(x)
+    x = Conv2D(512, (1,1), activation='relu', padding='same', name='conv_1x1_concat')(x)
     orig_4 = x
 
     x = ZeroPadding2D((1, 1))(x)
