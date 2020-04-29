@@ -39,11 +39,14 @@ a_dataset  = list(a_dataset)
 def get_raw(type_of_dataset, count):
     if type_of_dataset == 'fg':
         temp = fg_dataset[count]['image']
+        channels=3
     elif type_of_dataset == 'bg':
         temp = bg_dataset[count]['image']
+        channels=3
     else :
         temp = a_dataset[count]['image']
-    temp = tf.image.decode_jpeg(temp)
+        channels=1
+    temp = tf.image.decode_jpeg(temp, channels=channels)
     temp = np.asarray(temp)
     return temp
 
