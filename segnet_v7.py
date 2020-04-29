@@ -50,6 +50,7 @@ def build_encoder_decoder():
     x = Conv2D(256, (1,1), activation='relu', padding='same', name='conv_1x1_1_concat')(x)
     x = Conv2D(512, (1,1), activation='relu', padding='same', name='conv_1x1_2_concat')(x)
     orig_4 = x
+    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
     x = ZeroPadding2D((1, 1))(x)
     x = Conv2D(512, (3, 3), activation='relu', name='conv5_1')(x)
@@ -63,7 +64,7 @@ def build_encoder_decoder():
     # Decoder
     #
     x = UpSampling2D(size=(2, 2))(x)
-    the_shape = K.int_shape(orig_5)
+    the_shape = K.int_shape(orig_5) 
     shape = (1, the_shape[1], the_shape[2], the_shape[3])
     origReshaped = Reshape(shape)(orig_5)
     xReshaped = Reshape(shape)(x)
