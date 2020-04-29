@@ -9,11 +9,11 @@ from tensorflow.keras.utils import multi_gpu_model
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 # from data_generator_2 import train_gen, valid_gen
 from migrate import migrate_model
-from segnet_v8 import build_encoder_decoder, build_refinement
+from segnet_v9 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
-log_dir = './logs_8'
-checkpoint_models_path = './checkpoints_8/'
+log_dir = './logs_7'
+checkpoint_models_path = './checkpoints_7/'
 
 if __name__ == '__main__':
     # Parse arguments
