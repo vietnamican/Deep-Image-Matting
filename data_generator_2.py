@@ -83,7 +83,8 @@ def composite4(fg, bg, a, w, h):
     y = 0
     if bg_h > h:
         y = np.random.randint(0, bg_h - h)
-    bg = np.array(bg[y:y + h, x:x + w], np.float32)
+    bg = np.array(bg[y:y + h, x:x + w, np.newaxis], np.float32)
+    bg = np.reshape(bg, (h,w,))
     alpha = np.zeros((h, w, 1), np.float32)
     alpha[:, :, 0] = a / 255.
     print("-------------")
