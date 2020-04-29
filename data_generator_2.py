@@ -45,7 +45,7 @@ def get_raw(type_of_dataset, count):
         channels=3
     else :
         temp = a_dataset[count]['image']
-        channels=1
+        channels=0
     temp = tf.image.decode_jpeg(temp, channels=channels)
     temp = np.asarray(temp)
     return temp
@@ -86,10 +86,11 @@ def composite4(fg, bg, a, w, h):
     y = 0
     if bg_h > h:
         y = np.random.randint(0, bg_h - h)
-    bg = np.array(bg[y:y + h, x:x + w, -1], np.float32)
+    bg = np.array(bg[y:y + h, x:x + w], np.float32)
+    if bg.ndim == 2:
+        bg = np.reshape(bg, (h,w,1))
     bg = np.reshape(bg, (h,w,-1))
     fg = np.reshape(fg, (h,w,-1))
-    a  = np.reshape(a,  (h,w,-1))
     alpha = np.zeros((h, w, 1), np.float32)
     alpha[:, :, 0] = a / 255.
     print("-------------")
