@@ -12,8 +12,8 @@ from migrate import migrate_model
 from segnet_v9 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus
 
-log_dir = './logs_7'
-checkpoint_models_path = './checkpoints_7/'
+log_dir = './logs_9'
+checkpoint_models_path = './checkpoints_9/'
 
 if __name__ == '__main__':
     # Parse arguments
