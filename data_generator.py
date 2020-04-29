@@ -52,6 +52,11 @@ def composite4(fg, bg, a, w, h):
     bg = np.array(bg[y:y + h, x:x + w], np.float32)
     alpha = np.zeros((h, w, 1), np.float32)
     alpha[:, :, 0] = a / 255.
+    print("-------------")
+    print(alpha.shape)
+    print(fg.shape)
+    print(bg.shape)
+    print("-------------")
     im = alpha * fg + (1 - alpha) * bg
     im = im.astype(np.uint8)
     return im, a, fg, bg
