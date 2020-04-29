@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image 
 import cv2
 
-# tf.enable_eager_execution()
+tf.enable_eager_execution()
 
 def read_sample(serialized_example):
     feature_extraction = {
