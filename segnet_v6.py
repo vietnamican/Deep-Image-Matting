@@ -9,7 +9,7 @@ from tensorflow.keras.utils import plot_model
 from custom_layers.unpooling_layer import Unpooling
 
 ATROUS_RATES = [6, 12, 18]
-
+# light xception ASPP 31M
 def xception_block(x,channels):
     ##separable conv1
     x=Activation("relu")(x)

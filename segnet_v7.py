@@ -9,7 +9,7 @@ from tensorflow.keras.utils import plot_model
 from custom_layers.unpooling_layer import Unpooling
 
 ATROUS_RATES = [6, 12, 18]
-
+# Conv-MaxPool SPP 24M
 def build_encoder_decoder():
     # Encoder
     input_tensor = Input(shape=(320, 320, 4))
