@@ -1,6 +1,6 @@
 import tensorflow.keras.backend as K
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Reshape, \
+from tensorflow.keras.layers import SeparableConv2D, Input, Conv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Reshape, \
     Concatenate, Lambda
 from tensorflow.keras.models import Model
 from tensorflow.keras.utils import multi_gpu_model
@@ -9,32 +9,30 @@ from tensorflow.keras.utils import plot_model
 from custom_layers.unpooling_layer import Unpooling
 
 ATROUS_RATES = [6, 12, 18]
-# Conv-MaxPool SPP 24M
+# Conv-MaxPool ASPP 21M
 def build_encoder_decoder():
     # Encoder
     input_tensor = Input(shape=(320, 320, 4))
-    x = ZeroPadding2D((1, 1))(input_tensor)
-    x = Conv2D(64, (3, 3), activation='relu', name='conv1_1')(x)
+    x = Conv2D(64, (3, 3), padding='same', activation='relu', name='conv1_1')(input_tensor)
     x = BatchNormalization()(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(64, (3, 3), activation='relu', name='conv1_2')(x)
+    x = Conv2D(64, (3, 3), padding='same', activation='relu', name='conv1_2')(x)
     x = BatchNormalization()(x)
     orig_1 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(128, (3, 3), activation='relu', name='conv2_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(128, (3, 3), activation='relu', name='conv2_2')(x)
+    x = Conv2D(128, (3, 3), padding='same', activation='relu', name='conv2_1')(x)
+    x = BatchNormalization()(x)
+    x = Conv2D(128, (3, 3), padding='same', activation='relu', name='conv2_2')(x)
+    x = BatchNormalization()(x)
     orig_2 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(256, (3, 3), activation='relu', name='conv3_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(256, (3, 3), activation='relu', name='conv3_2')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(256, (3, 3), activation='relu', name='conv3_3')(x)
+    x = Conv2D(256, (3, 3), padding='same', activation='relu', name='conv3_1')(x)
+    x = BatchNormalization()(x)
+    x = Conv2D(256, (3, 3), padding='same', activation='relu', name='conv3_2')(x)
+    x = BatchNormalization()(x)
+    x = Conv2D(256, (3, 3), padding='same', activation='relu', name='conv3_3')(x)
+    x = BatchNormalization()(x)
     orig_3 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     inputs_size = x.get_shape()[1:3]
@@ -50,16 +48,18 @@ def build_encoder_decoder():
     # Concat
     x = Concatenate(axis=3)([conv_4_1x1, conv_4_3x3_1, conv_4_3x3_2, conv_4_3x3_3, image_level_features])
     x = Conv2D(512, (1,1), activation='relu', padding='same', name='conv_1x1_1_concat')(x)
+    x = BatchNormalization()(x)
     x = Conv2D(512, (1,1), activation='relu', padding='same', name='conv_1x1_2_concat')(x)
+    x = BatchNormalization()(x)
     orig_4 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv5_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv5_2')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv5_3')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_1')(x)
+    x = BatchNormalization()(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_2')(x)
+    x = BatchNormalization()(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_3')(x)
+    x = BatchNormalization()(x)
     orig_5 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 

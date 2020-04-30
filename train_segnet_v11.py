@@ -9,11 +9,11 @@ from tensorflow.keras.utils import multi_gpu_model
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 from data_generator_2 import train_gen, valid_gen
 from migrate import migrate_model
-from segnet_v7 import build_encoder_decoder, build_refinement
+from segnet_v11 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch
 
-log_dir = './logs_7'
-checkpoint_models_path = './checkpoints_7/cp-{epoch:04d}-{val_loss:.4f}.ckpt'
+log_dir = './logs_11'
+checkpoint_models_path = './checkpoints_11/cp-{epoch:04d}-{val_loss:.4f}.ckpt'
 checkpoint_dir = os.path.dirname(checkpoint_models_path)
 
 if __name__ == '__main__':
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     else:
         initial_epoch = 0
     final.compile(optimizer='nadam', loss=overall_loss)
+
     print(final.summary())
 
     # Final callbacks

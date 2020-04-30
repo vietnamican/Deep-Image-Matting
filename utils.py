@@ -4,6 +4,7 @@ import cv2 as cv
 import tensorflow.keras.backend as K
 import numpy as np
 from tensorflow.python.client import device_lib
+import re
 
 from config import epsilon, epsilon_sqr
 from config import img_cols
@@ -146,3 +147,7 @@ def draw_str(dst, target, s):
     x, y = target
     cv.putText(dst, s, (x + 1, y + 1), cv.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), thickness=2, lineType=cv.LINE_AA)
     cv.putText(dst, s, (x, y), cv.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), lineType=cv.LINE_AA)
+
+def get_initial_epoch(filepath):
+    x = re.search(r"cp-(\d{4})", filepath)
+    return int(x.group(1))
