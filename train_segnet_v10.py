@@ -7,13 +7,13 @@ from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLRO
 from tensorflow.keras.utils import multi_gpu_model
 
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
-from data_generator_2 import train_gen, valid_gen
+from data_generator import train_gen, valid_gen
 from migrate import migrate_model
 from segnet_v10 import build_encoder_decoder, build_refinement
-from utils import overall_loss, get_available_cpus, get_available_gpus
+from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch
 
 log_dir = './logs_10'
-checkpoint_models_path = './checkpoints_10/cp-{epoch:04d}.ckpt'
+checkpoint_models_path = './checkpoints_1/cp-{epoch:04d}-{val_loss:.4f}.ckpt'
 checkpoint_dir = os.path.dirname(checkpoint_models_path)
 
 if __name__ == '__main__':
@@ -61,6 +61,9 @@ if __name__ == '__main__':
     if len(os.listdir(checkpoint_dir)) > 0:
         latest = tf.train.latest_checkpoint(checkpoint_dir)
         final.load_weights(latest)
+        initial_epoch = get_initial_epoch(latest)
+    else:
+        initial_epoch = 0
     final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
@@ -69,13 +72,14 @@ if __name__ == '__main__':
     callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
 
     # Start Fine-tuning
-    final.fit_generator(train_gen(),
+    final.fit(train_gen(),
                         steps_per_epoch=num_train_samples // batch_size,
                         validation_data=valid_gen(),
                         validation_steps=num_valid_samples // batch_size,
                         epochs=epochs,
                         verbose=1,
                         callbacks=callbacks,
+                        initial_epoch=initial_epoch
                         # use_multiprocessing=True,
                         # workers=2
                         )
