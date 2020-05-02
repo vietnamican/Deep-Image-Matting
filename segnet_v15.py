@@ -33,6 +33,7 @@ def build_encoder_decoder():
     x = Conv2D(512, (3, 3), padding='same', activation='relu', name='conv4_1')(x)
     x = Conv2D(512, (3, 3), padding='same', activation='relu', name='conv4_2')(x)
     orig_4 = x
+    res = Conv2D(256, (1,1), padding='same', activation='relu', name='res')(x)
     # x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     inputs_size = x.get_shape()[1:3]
     conv_4_1x1 = SeparableConv2D(256, (1, 1), activation='relu', padding='same', name='conv4_1x1')(x)
@@ -46,8 +47,8 @@ def build_encoder_decoder():
     # Concat
     x = Concatenate(axis=3)([conv_4_1x1, conv_4_3x3_1, conv_4_3x3_2, conv_4_3x3_3])
     x = SeparableConv2D(256, (3,3), activation='relu', padding='same', name='conv_1x1_1_concat')(x)
-    x = SeparableConv2D(512, (3,3), activation='relu', padding='same', name='conv_1x1_2_concat')(x)
-    x = Concatenate(axis=3)([orig_4, x])
+    x = SeparableConv2D(256, (3,3), activation='relu', padding='same', name='conv_1x1_2_concat')(x)
+    x = Concatenate(axis=3)([res, x])
     # orig_4 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
