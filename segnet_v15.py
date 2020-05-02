@@ -39,13 +39,12 @@ def build_encoder_decoder():
     conv_4_3x3_1 = SeparableConv2D(256, (3, 3), activation='relu', padding='same', dilation_rate=ATROUS_RATES[0], name='conv4_3x3_1')(x)
     conv_4_3x3_2 = SeparableConv2D(256, (3, 3), activation='relu', padding='same', dilation_rate=ATROUS_RATES[1], name='conv4_3x3_2')(x)
     conv_4_3x3_3 = SeparableConv2D(256, (3, 3), activation='relu', padding='same', dilation_rate=ATROUS_RATES[2], name='conv4_3x3_3')(x)
-    conv_4_3x3_4 = SeparableConv2D(256, (3, 3), activation='relu', padding='same', dilation_rate=ATROUS_RATES[3], name='conv4_3x3_4')(x)
     # # Image average pooling
     # image_level_features = Lambda(lambda x: tf.reduce_mean(x, [1, 2], keepdims=True), name='global_average_pooling')(x)
     # image_level_features = Conv2D(256, (1, 1), activation='relu', padding='same', name='image_level_features_conv_1x1')(image_level_features)
     # image_level_features = Lambda(lambda x: tf.image.resize(x, inputs_size), name='upsample_1')(image_level_features)
     # Concat
-    x = Concatenate(axis=3)([conv_4_1x1, conv_4_3x3_1, conv_4_3x3_2, conv_4_3x3_3, conv_4_3x3_4])
+    x = Concatenate(axis=3)([conv_4_1x1, conv_4_3x3_1, conv_4_3x3_2, conv_4_3x3_3])
     x = SeparableConv2D(256, (3,3), activation='relu', padding='same', name='conv_1x1_1_concat')(x)
     x = SeparableConv2D(512, (3,3), activation='relu', padding='same', name='conv_1x1_2_concat')(x)
     x = Concatenate(axis=3)([orig_4, x])
