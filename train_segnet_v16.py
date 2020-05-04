@@ -12,8 +12,8 @@ from migrate import migrate_model
 from segnet_v16 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch
 
-log_dir = './logs_16'
-checkpoint_models_path = './checkpoints_16/cp-{epoch:04d}-{val_loss:.4f}.ckpt'
+log_dir = './logs_16_2'
+checkpoint_models_path = './checkpoints_16_2/cp-{epoch:04d}-{loss:.4f}-{val_loss:.4f}.ckpt'
 checkpoint_dir = os.path.dirname(checkpoint_models_path)
 
 if __name__ == '__main__':
