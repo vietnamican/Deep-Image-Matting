@@ -67,6 +67,7 @@ if __name__ == '__main__':
     final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
+    # keras.utils.plot_model(final, "model_original.png")
 
     # Final callbacks
     callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]

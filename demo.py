@@ -7,7 +7,7 @@ import tensorflow.keras.backend as K
 import numpy as np
 
 from data_generator import generate_trimap, random_choice, get_alpha_test
-from segnet import build_encoder_decoder, build_refinement
+from segnet_v16 import build_encoder_decoder, build_refinement
 from utils import compute_mse_loss, compute_sad_loss
 from utils import get_final_output, safe_crop, draw_str
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     img_rows, img_cols = 320, 320
     channel = 4
 
-    pretrained_path = 'final.01-0.1086.hdf5'
+    pretrained_path = 'checkpoints_16/cp-0020-0.0683.ckpt'
     encoder_decoder = build_encoder_decoder()
     final = build_refinement(encoder_decoder)
     final.load_weights(pretrained_path)
