@@ -9,11 +9,11 @@ from tensorflow.keras.utils import multi_gpu_model
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
 from data_generator_2 import train_gen, valid_gen
 from migrate import migrate_model
-from segnet import build_encoder_decoder, build_refinement
+from model_v16 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch
 
-log_dir = './logs_1_3'
-checkpoint_models_path = './checkpoints_1_3/cp-{epoch:04d}-{loss:.4f}-{val_loss:.4f}.ckpt'
+log_dir = './logs_16_3'
+checkpoint_models_path = './checkpoints_16_3/cp-{epoch:04d}-{loss:.4f}-{val_loss:.4f}.ckpt'
 checkpoint_dir = os.path.dirname(checkpoint_models_path)
 
 if __name__ == '__main__':
@@ -67,14 +67,14 @@ if __name__ == '__main__':
     final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
-    keras.utils.plot_model(final, "model_original.png")
+    # keras.utils.plot_model(final, "model_modified.png")
 
     # Final callbacks
     callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
 
     # Start Fine-tuning
     final.fit(train_gen(),
-                        batch_size = 4,
+                        batch_size=4,
                         validation_data=valid_gen(),
                         epochs=epochs,
                         verbose=1,

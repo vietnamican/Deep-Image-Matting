@@ -1,58 +1,61 @@
 import tensorflow.keras.backend as K
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Concatenate, \
-    Reshape, Lambda
+from tensorflow.keras.layers import SeparableConv2D, Input, Conv2D, UpSampling2D, BatchNormalization, ZeroPadding2D, MaxPooling2D, Reshape, \
+    Concatenate, Lambda, Add, Activation
 from tensorflow.keras.models import Model
 from tensorflow.keras.utils import multi_gpu_model
 from tensorflow.keras.utils import plot_model
 
 from custom_layers.unpooling_layer import Unpooling
 
-
-from custom_layers.unpooling_layer import Unpooling
-
-
+ATROUS_RATES = [1, 2, 3]
+# Conv-MaxPool ASPP 21M
 def build_encoder_decoder():
     # Encoder
     input_tensor = Input(shape=(320, 320, 4))
-    x = ZeroPadding2D((1, 1))(input_tensor)
-    x = Conv2D(64, (3, 3), activation='relu', name='conv1_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(64, (3, 3), activation='relu', name='conv1_2')(x)
+    x = Conv2D(64, (3, 3), padding='same', activation='relu', name='conv1_1')(input_tensor)
+    x = Conv2D(64, (3, 3), padding='same', activation='relu', name='conv1_2')(x)
     orig_1 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(128, (3, 3), activation='relu', name='conv2_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(128, (3, 3), activation='relu', name='conv2_2')(x)
+    x = Conv2D(128, (3, 3), padding='same', activation='relu', name='conv2_1')(x)
+    x = Conv2D(128, (3, 3), padding='same', activation='relu', name='conv2_2')(x)
     orig_2 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(256, (3, 3), activation='relu', name='conv3_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(256, (3, 3), activation='relu', name='conv3_2')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(256, (3, 3), activation='relu', name='conv3_3')(x)
+    x = Conv2D(256, (3, 3), padding='same', activation='relu', name='conv3_1')(x)
+    x = Conv2D(256, (3, 3), padding='same', activation='relu', name='conv3_2')(x)
+    x = Conv2D(256, (3, 3), padding='same', activation='relu', name='conv3_3')(x)
     orig_3 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv4_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv4_2')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv4_3')(x)
+
+    x = Conv2D(512, (3, 3), padding='same', activation='relu', name='conv4_1')(x)
+    x = Conv2D(512, (3, 3), padding='same', activation='relu', name='conv4_2')(x)
     orig_4 = x
+    res = Conv2D(512, (1,1), padding='same', activation='relu', name='res')(x)
+    # x = MaxPooling2D((2, 2), strides=(2, 2))(x)
+    inputs_size = x.get_shape()[1:3]
+    conv_4_1x1 = SeparableConv2D(256, (1, 1), activation='relu', padding='same', name='conv4_1x1')(x)
+    conv_4_3x3_1 = SeparableConv2D(256, (3, 3), activation='relu', padding='same', dilation_rate=ATROUS_RATES[0], name='conv4_3x3_1')(x)
+    conv_4_3x3_2 = SeparableConv2D(256, (3, 3), activation='relu', padding='same', dilation_rate=ATROUS_RATES[1], name='conv4_3x3_2')(x)
+    conv_4_3x3_3 = SeparableConv2D(256, (3, 3), activation='relu', padding='same', dilation_rate=ATROUS_RATES[2], name='conv4_3x3_3')(x)
+    # # Image average pooling
+    # image_level_features = Lambda(lambda x: tf.reduce_mean(x, [1, 2], keepdims=True), name='global_average_pooling')(x)
+    # image_level_features = Conv2D(256, (1, 1), activation='relu', padding='same', name='image_level_features_conv_1x1')(image_level_features)
+    # image_level_features = Lambda(lambda x: tf.image.resize(x, inputs_size), name='upsample_1')(image_level_features)
+    # Concat
+    x = Concatenate(axis=3)([conv_4_1x1, conv_4_3x3_1, conv_4_3x3_2, conv_4_3x3_3])
+    x = SeparableConv2D(256, (3,3), activation='relu', padding='same', name='conv_1x1_1_concat')(x)
+    x = SeparableConv2D(512, (3,3), activation='relu', padding='same', name='conv_1x1_2_concat')(x)
+    x = Add()([res, x])
+    x = Activation("relu")(x)
+    # orig_4 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv5_1')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv5_2')(x)
-    x = ZeroPadding2D((1, 1))(x)
-    x = Conv2D(512, (3, 3), activation='relu', name='conv5_3')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_1')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_2')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_3')(x)
     orig_5 = x
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
 
