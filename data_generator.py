@@ -103,7 +103,7 @@ class DataGenSequence(Sequence):
         filename = '{}_names.txt'.format(usage)
         with open(filename, 'r') as f:
             self.names = f.read().splitlines()
-
+            self.names = self.names[:34480]
         np.random.shuffle(self.names)
 
     def __len__(self):
