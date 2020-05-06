@@ -74,12 +74,12 @@ if __name__ == '__main__':
 
     # Start Fine-tuning
     final.fit(train_gen(),
-                        batch_size=4,
+                        steps_per_epoch=num_train_samples // batch_size,
                         validation_data=valid_gen(),
+                        validation_steps=num_valid_samples // batch_size,
                         epochs=epochs,
                         verbose=1,
                         callbacks=callbacks,
-                        initial_epoch=initial_epoch,
                         use_multiprocessing=True,
                         workers=2
                         )
