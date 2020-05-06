@@ -44,20 +44,7 @@ if __name__ == '__main__':
     # Load our model, added support for Multi-GPUs
     num_gpu = len(get_available_gpus())
     if num_gpu >= 2:
-        with tf.device("/cpu:0"):    # # Final callbacks
-    # callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
-
-    # # Start Fine-tuning
-    # final.fit(train_gen(),
-    #                     batch_size = 4,
-    #                     validation_data=valid_gen(),
-    #                     epochs=epochs,
-    #                     verbose=1,
-    #                     callbacks=callbacks,
-    #                     initial_epoch=initial_epoch,
-    #                     use_multiprocessing=True,
-    #                     workers=2
-    #                     )
+        with tf.device("/cpu:0"):
             model = build_encoder_decoder()
             model = build_refinement(model)
             # if pretrained_path is not None:
@@ -80,14 +67,14 @@ if __name__ == '__main__':
     final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
-    keras.utils.plot_model(final, "model_original.png")
+    # keras.utils.plot_model(final, "model_original.png")
 
     # Final callbacks
     callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
 
     # Start Fine-tuning
     final.fit(train_gen(),
-                        batch_size = 4,
+                        batch_size=4,
                         validation_data=valid_gen(),
                         epochs=epochs,
                         verbose=1,
