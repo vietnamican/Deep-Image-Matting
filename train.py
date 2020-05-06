@@ -7,7 +7,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLRO
 from tensorflow.keras.utils import multi_gpu_model
 
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
-# from data_generator_2 import train_gen, valid_gen
+from data_generator_2 import train_gen, valid_gen
 from migrate import migrate_model
 from model import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch
@@ -82,17 +82,17 @@ if __name__ == '__main__':
     print(final.summary())
     keras.utils.plot_model(final, "model_original.png")
 
-    # # Final callbacks
-    # callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
+    # Final callbacks
+    callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
 
-    # # Start Fine-tuning
-    # final.fit(train_gen(),
-    #                     batch_size = 4,
-    #                     validation_data=valid_gen(),
-    #                     epochs=epochs,
-    #                     verbose=1,
-    #                     callbacks=callbacks,
-    #                     initial_epoch=initial_epoch,
-    #                     use_multiprocessing=True,
-    #                     workers=2
-    #                     )
+    # Start Fine-tuning
+    final.fit(train_gen(),
+                        batch_size = 4,
+                        validation_data=valid_gen(),
+                        epochs=epochs,
+                        verbose=1,
+                        callbacks=callbacks,
+                        initial_epoch=initial_epoch,
+                        use_multiprocessing=True,
+                        workers=2
+                        )
