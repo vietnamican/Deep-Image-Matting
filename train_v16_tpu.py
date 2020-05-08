@@ -7,7 +7,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLRO
 from tensorflow.keras.utils import multi_gpu_model
 
 from config import patience, batch_size, epochs, num_train_samples, num_valid_samples
-from data_generator_2 import train_gen, valid_gen
+from data_generator import train_gen, valid_gen
 from migrate import migrate_model
 from model_v16 import build_encoder_decoder, build_refinement
 from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
 
     # Load our model, added support for Multi-GPUs
-    # num_gpu = len(get_available_gpus())
+    num_gpu = len(get_available_gpus())
     # if num_gpu >= 2:
     #     with tf.device("/cpu:0"):
     #         model = build_encoder_decoder()
@@ -64,16 +64,16 @@ if __name__ == '__main__':
     #     # rewrite the callback: saving through the original model and not the multi-gpu model.
     #     model_checkpoint = MyCbk(model)
     # else:
-    #     model = build_encoder_decoder()
-    #     final = build_refinement(model)
-        # if pretrained_path is not None:
-        #     final.load_weights(pretrained_path)
+        
+    #     # if pretrained_path is not None:
+    #     #     final.load_weights(pretrained_path)
     with tpu_strategy.scope():
         model = build_encoder_decoder()
         final = build_refinement(model)
     if len(os.listdir(checkpoint_dir)) > 0:
         latest = tf.train.latest_checkpoint(checkpoint_dir)
-        final.load_weights(os.path.join(os.getcwd(), latest[2:]))
+        final.load_weights(latest)
+        # final.load_weights("./checkpoints_16_4/cp-0020-0.0460-0.0909.h5")
         initial_epoch = get_initial_epoch(latest)
     else:
         initial_epoch = 0

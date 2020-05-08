@@ -5,6 +5,7 @@ import tensorflow.keras.backend as K
 import numpy as np
 from tensorflow.python.client import device_lib
 import re
+import os
 
 from config import epsilon, epsilon_sqr
 from config import img_cols
@@ -151,3 +152,16 @@ def draw_str(dst, target, s):
 def get_initial_epoch(filepath):
     x = re.search(r"cp-(\d{4})", filepath)
     return int(x.group(1))
+
+def get_latest_checkpoint(checkpoint_dir):
+    latest = ""
+    index_latest = 0
+    for file_name in os.listdir(checkpoint_dir):
+        print(file_name)
+        x = re.search(r"cp-(\d{4})", file_name)
+        x = int(x.group(1))
+        if x > index_latest:
+            latest = file_name
+            index_latest = x
+    
+    return latest
