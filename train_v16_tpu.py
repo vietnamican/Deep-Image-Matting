@@ -70,14 +70,14 @@ if __name__ == '__main__':
     with tpu_strategy.scope():
         model = build_encoder_decoder()
         final = build_refinement(model)
-    if len(os.listdir(checkpoint_dir)) > 0:
-        latest = get_initial_epoch(checkpoint_dir)
-        # latest = tf.train.latest_checkpoint(checkpoint_dir)
-        final.load_weights(checkpoint_dir + "/" + latest)
-        # final.load_weights("./checkpoints_16_4/cp-0020-0.0460-0.0909.h5")
-        initial_epoch = get_initial_epoch(latest)
-    else:
-        initial_epoch = 0
+    # if len(os.listdir(checkpoint_dir)) > 0:
+    #     latest = get_initial_epoch(checkpoint_dir)
+    #     # latest = tf.train.latest_checkpoint(checkpoint_dir)
+    #     final.load_weights(checkpoint_dir + "/" + latest)
+    #     # final.load_weights("./checkpoints_16_4/cp-0020-0.0460-0.0909.h5")
+    #     initial_epoch = get_initial_epoch(latest)
+    # else:
+    #     initial_epoch = 0
     final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
@@ -93,7 +93,7 @@ if __name__ == '__main__':
                         epochs=epochs,
                         verbose=1,
                         callbacks=callbacks,
-                        initial_epoch=initial_epoch,
+                        # initial_epoch=initial_epoch,
                         # use_multiprocessing=True,
                         # workers=2
                         )
