@@ -78,7 +78,7 @@ if __name__ == '__main__':
     #     initial_epoch = get_initial_epoch(latest)
     # else:
     #     initial_epoch = 0
-    final.compile(optimizer='nadam', loss=overall_loss)
+        final.compile(optimizer='nadam', loss=overall_loss)
 
     print(final.summary())
     # keras.utils.plot_model(final, "model_modified.png")
