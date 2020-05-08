@@ -80,20 +80,20 @@ if __name__ == '__main__':
     #     initial_epoch = 0
         final.compile(optimizer='nadam', loss=overall_loss)
 
-    print(final.summary())
-    # keras.utils.plot_model(final, "model_modified.png")
+        print(final.summary())
+        # keras.utils.plot_model(final, "model_modified.png")
 
-    # Final callbacks
-    callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
+        # Final callbacks
+        callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
 
-    # Start Fine-tuning
-    final.fit(train_gen(),
-                        batch_size=4,
-                        validation_data=valid_gen(),
-                        epochs=epochs,
-                        verbose=1,
-                        callbacks=callbacks,
-                        # initial_epoch=initial_epoch,
-                        # use_multiprocessing=True,
-                        # workers=2
-                        )
+        # Start Fine-tuning
+        final.fit(train_gen(),
+                            batch_size=4,
+                            validation_data=valid_gen(),
+                            epochs=epochs,
+                            verbose=1,
+                            callbacks=callbacks,
+                            # initial_epoch=initial_epoch,
+                            # use_multiprocessing=True,
+                            # workers=2
+                            )
