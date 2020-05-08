@@ -22,8 +22,8 @@ tf.config.experimental_connect_to_cluster(tpu)
 tf.tpu.experimental.initialize_tpu_system(tpu)
 tpu_strategy = tf.distribute.experimental.TPUStrategy(tpu)
 
-log_dir = './logs_16_3'
-checkpoint_models_path = './checkpoints_16_3/cp-{epoch:04d}-{loss:.4f}-{val_loss:.4f}.h5'
+log_dir = './logs_16_4'
+checkpoint_models_path = './checkpoints_16_4/cp-{epoch:04d}-{loss:.4f}-{val_loss:.4f}.h5'
 checkpoint_dir = os.path.dirname(checkpoint_models_path)
 
 if __name__ == '__main__':
