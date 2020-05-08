@@ -10,7 +10,7 @@ from config import patience, batch_size, epochs, num_train_samples, num_valid_sa
 from data_generator import train_gen, valid_gen
 from migrate import migrate_model
 from model_v16 import build_encoder_decoder, build_refinement
-from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch
+from utils import overall_loss, get_available_cpus, get_available_gpus, get_initial_epoch, get_initial_epoch
 
 try:
   tpu = tf.distribute.cluster_resolver.TPUClusterResolver()  # TPU detection
@@ -23,7 +23,7 @@ tf.tpu.experimental.initialize_tpu_system(tpu)
 tpu_strategy = tf.distribute.experimental.TPUStrategy(tpu)
 
 log_dir = './logs_16_3'
-checkpoint_models_path = './checkpoints_16_3/cp-{epoch:04d}-{loss:.4f}-{val_loss:.4f}.ckpt'
+checkpoint_models_path = './checkpoints_16_3/cp-{epoch:04d}-{loss:.4f}-{val_loss:.4f}.h5'
 checkpoint_dir = os.path.dirname(checkpoint_models_path)
 
 if __name__ == '__main__':
@@ -71,8 +71,9 @@ if __name__ == '__main__':
         model = build_encoder_decoder()
         final = build_refinement(model)
     if len(os.listdir(checkpoint_dir)) > 0:
-        latest = tf.train.latest_checkpoint(checkpoint_dir)
-        final.load_weights(latest)
+        latest = get_initial_epoch(checkpoint_dir)
+        # latest = tf.train.latest_checkpoint(checkpoint_dir)
+        final.load_weights(checkpoint_dir + "/" + latest)
         # final.load_weights("./checkpoints_16_4/cp-0020-0.0460-0.0909.h5")
         initial_epoch = get_initial_epoch(latest)
     else:
