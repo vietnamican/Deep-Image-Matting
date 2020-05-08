@@ -27,16 +27,16 @@ def migrate_model(new_model):
     new_conv1_1 = new_model.get_layer('conv1_1')
     new_conv1_1.set_weights([new_weights, old_biases])
 
-    for i in range(2, 31):
-        old_layer = old_layers[i]
-        new_layer = new_layers[i + 1]
-        new_layer.set_weights(old_layer.get_weights())
-    # for i in range(11):
-    #     index_vgg = vgg_16[i]
-    #     index_model = v_16[i]
-    #     old_layer = old_layers[index_vgg-1]
-    #     new_layer = new_layers[index_model]
+    # for i in range(2, 31):
+    #     old_layer = old_layers[i]
+    #     new_layer = new_layers[i + 1]
     #     new_layer.set_weights(old_layer.get_weights())
+    for i in range(11):
+        index_vgg = vgg_16[i]
+        index_model = v_16[i]
+        old_layer = old_layers[index_vgg-1]
+        new_layer = new_layers[index_model]
+        new_layer.set_weights(old_layer.get_weights())
     # flatten = old_model.get_layer('flatten')
     # f_dim = flatten.input_shape
     # print('f_dim: ' + str(f_dim))

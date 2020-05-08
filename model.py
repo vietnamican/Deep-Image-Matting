@@ -8,10 +8,6 @@ from tensorflow.keras.utils import plot_model
 
 from custom_layers.unpooling_layer import Unpooling
 
-
-from custom_layers.unpooling_layer import Unpooling
-
-
 def build_encoder_decoder():
     # Encoder
     input_tensor = Input(shape=(320, 320, 4))
