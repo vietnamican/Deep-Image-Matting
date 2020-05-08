@@ -73,7 +73,7 @@ if __name__ == '__main__':
         final = build_refinement(model)
     if len(os.listdir(checkpoint_dir)) > 0:
         latest = tf.train.latest_checkpoint(checkpoint_dir)
-        final.load_weights(latest)
+        final.load_weights(os.path.join(os.getcwd(), latest[2:]))
         initial_epoch = get_initial_epoch(latest)
     else:
         initial_epoch = 0
